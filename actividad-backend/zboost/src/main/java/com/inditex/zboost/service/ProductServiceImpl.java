@@ -39,8 +39,19 @@ public class ProductServiceImpl implements ProductService {
          */
 
         Map<String, Object> params = new HashMap<>();
+        String sql = "SELECT * FROM products";
 
-        String sql = "";
+        if(categories.get().size()>0){
+            sql += "WHERE";
+            for(int i = 0; i < categories.get().size(); i++) {
+                sql += " UPPER(category) LIKE UPPER(%:category)" + i + "%";
+                params.put("category" + i, categories.get().get(i));
+                if(i!=categories.get().size()-1){
+                    sql += "OR";
+                }
+            }
+        }
+
 
         return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Product.class));
     }
@@ -51,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
          * TODO: EJERCICIO 1.b) Recupera las distintas categorias de los productos disponibles.
          */
 
-        String sql = "";
+        String sql = "SELECT DISTINCT category FROM products";
 
         return jdbcTemplate.queryForList(sql, (SqlParameterSource) null, String.class);
     }
